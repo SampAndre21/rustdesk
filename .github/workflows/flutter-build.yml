@@ -92,6 +92,14 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Patch private server configuration
+        shell: bash
+        run: |
+          sed -i 's|"rs-ny.rustdesk.com"|"172.18.17.14"|g' libs/hbb_common/src/config.rs
+          sed -i 's|OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=|0YTTP88ODjJPaK56HpFG1AE7UEVbWJ5HR40SlbpbJV8=|g' libs/hbb_common/src/config.rs
+          echo "=== Verifica patch ==="
+          grep -n "RENDEZVOUS_SERVERS\|RS_PUB_KEY" libs/hbb_common/src/config.rs
+
       - name: Restore bridge files
         uses: actions/download-artifact@master
         with:
@@ -900,6 +908,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Patch private server configuration
+        shell: bash
+        run: |
+          sed -i 's|"rs-ny.rustdesk.com"|"172.18.17.14"|g' libs/hbb_common/src/config.rs
+          sed -i 's|OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=|0YTTP88ODjJPaK56HpFG1AE7UEVbWJ5HR40SlbpbJV8=|g' libs/hbb_common/src/config.rs
+          echo "=== Verifica patch ==="
+          grep -n "RENDEZVOUS_SERVERS\|RS_PUB_KEY" libs/hbb_common/src/config.rs
 
       - name: Install flutter
         uses: subosito/flutter-action@v2
