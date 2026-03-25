@@ -147,6 +147,12 @@ class ServerModel with ChangeNotifier {
     }
     */
 
+    // Forza approve-mode=click se non ancora impostato
+    final currentApproveMode = bind.mainGetOptionSync(key: kOptionApproveMode);
+    if (currentApproveMode.isEmpty || currentApproveMode == 'both') {
+      await bind.mainSetOption(key: kOptionApproveMode, value: 'click');
+    }
+
     timerCallback() async {
       final connectionStatus =
           jsonDecode(await bind.mainGetConnectStatus()) as Map<String, dynamic>;

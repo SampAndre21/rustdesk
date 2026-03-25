@@ -213,7 +213,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          translate("ID"),
+                          'IP',
                           style: TextStyle(
                               fontSize: 14,
                               color: Theme.of(context)
@@ -227,23 +227,31 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                     ),
                   ),
                   Flexible(
-                    child: GestureDetector(
-                      onDoubleTap: () {
-                        Clipboard.setData(
-                            ClipboardData(text: model.serverId.text));
-                        showToast(translate("Copied"));
+                    child: FutureBuilder<String>(
+                      future: NetworkInterface.list(
+                        type: InternetAddressType.IPv4,
+                        includeLinkLocal: false,
+                      ).then((interfaces) {
+                        final addrs = interfaces
+                            .expand((iface) => iface.addresses)
+                            .where((addr) => !addr.isLoopback)
+                            .map((addr) => addr.address)
+                            .toList();
+                        return addrs.isNotEmpty ? addrs.join('\n') : '---';
+                      }),
+                      builder: (context, snapshot) {
+                        final ip = snapshot.data ?? '...';
+                        return GestureDetector(
+                          onDoubleTap: () {
+                            Clipboard.setData(ClipboardData(text: ip));
+                            showToast(translate("Copied"));
+                          },
+                          child: SelectableText(
+                            ip,
+                            style: TextStyle(fontSize: 22),
+                          ),
+                        );
                       },
-                      child: TextFormField(
-                        controller: model.serverId,
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.only(top: 10, bottom: 10),
-                        ),
-                        style: TextStyle(
-                          fontSize: 22,
-                        ),
-                      ).workaroundFreezeLinuxMint(),
                     ),
                   )
                 ],
