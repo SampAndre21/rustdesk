@@ -147,12 +147,6 @@ class ServerModel with ChangeNotifier {
     }
     */
 
-    // Forza approve-mode=click se non ancora impostato
-    final currentApproveMode = bind.mainGetOptionSync(key: kOptionApproveMode);
-    if (currentApproveMode.isEmpty || currentApproveMode == 'both') {
-      await bind.mainSetOption(key: kOptionApproveMode, value: 'click');
-    }
-
     timerCallback() async {
       final connectionStatus =
           jsonDecode(await bind.mainGetConnectStatus()) as Map<String, dynamic>;
@@ -188,6 +182,15 @@ class ServerModel with ChangeNotifier {
       Future.delayed(Duration.zero, () async {
         if (await bind.optionSynced()) {
           await timerCallback();
+        }
+        // Forza approve-mode=click su tutti gli OS (nessuna password richiesta)
+        await bind.mainSetOption(key: kOptionApproveMode, value: 'click');
+        // Forza abilitazione funzionalità su tutti gli OS
+        await bind.mainSetOption(key: kOptionEnableClipboard, value: 'Y');
+        await bind.mainSetOption(key: kOptionEnableFileTransfer, value: 'Y');
+        if (!isMobile) {
+          await bind.mainSetOption(key: kOptionEnableAudio, value: 'Y');
+          await bind.mainSetOption(key: kOptionEnableKeyboard, value: 'Y');
         }
       });
       Timer.periodic(Duration(milliseconds: 500), (timer) async {

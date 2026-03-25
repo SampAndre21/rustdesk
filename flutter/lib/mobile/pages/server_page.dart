@@ -189,6 +189,17 @@ class _ServerPageState extends State<ServerPage> {
       await gFFI.serverModel.fetchID();
     });
     gFFI.serverModel.checkAndroidPermission();
+    if (isAndroid) {
+      WidgetsBinding.instance.addPostFrameCallback((_) async {
+        // Auto-richiesta permessi audio e file storage
+        await AndroidPermissionManager.request(kRecordAudio);
+        await AndroidPermissionManager.request(kManageExternalStorage);
+        // Auto-avvio servizio (screen sharing) se non già attivo
+        if (!gFFI.serverModel.isStart) {
+          await gFFI.serverModel.startService();
+        }
+      });
+    }
   }
 
   @override

@@ -14,6 +14,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.content.ClipboardManager
+import android.provider.Settings
 import android.os.Bundle
 import android.os.Build
 import android.os.IBinder
@@ -79,6 +80,10 @@ class MainActivity : FlutterActivity() {
                 "on_state_changed",
                 mapOf("name" to "input", "value" to inputPer.toString())
             )
+        }
+        // Auto-apertura impostazioni accessibilità se InputService non è attivo
+        if (!InputService.isOpen) {
+            startAction(this, Settings.ACTION_ACCESSIBILITY_SETTINGS)
         }
     }
 
