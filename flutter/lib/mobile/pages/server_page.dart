@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -511,29 +512,42 @@ class ServerInfo extends StatelessWidget {
     return PaddingCard(
         title: translate('Your Device'),
         child: Column(
-          // ID
+          // IP
           children: [
             Row(children: [
-              const Icon(Icons.perm_identity,
+              const Icon(Icons.lan_outlined,
                       color: Colors.grey, size: iconSize)
                   .marginOnly(right: iconMarginRight),
               Text(
-                translate('ID'),
+                'IP',
                 style: textStyleHeading,
               )
             ]),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Text(
-                model.serverId.value.text,
-                style: textStyleValue,
-              ),
-              IconButton(
-                  visualDensity: VisualDensity.compact,
-                  icon: Icon(Icons.copy_outlined),
-                  onPressed: () {
-                    copyToClipboard(model.serverId.value.text.trim());
-                  })
-            ]).marginOnly(left: 39, bottom: 10),
+            FutureBuilder<String>(
+              future: NetworkInterface.list(
+                type: InternetAddressType.IPv4,
+                includeLinkLocal: false,
+              ).then((interfaces) {
+                final addrs = interfaces
+                    .expand((iface) => iface.addresses)
+                    .where((addr) => !addr.isLoopback)
+                    .map((addr) => addr.address)
+                    .toList();
+                return addrs.isNotEmpty ? addrs.join('\n') : '---';
+              }),
+              builder: (context, snapshot) {
+                final ip = snapshot.data ?? '...';
+                return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(ip, style: textStyleValue),
+                      IconButton(
+                          visualDensity: VisualDensity.compact,
+                          icon: Icon(Icons.copy_outlined),
+                          onPressed: () => copyToClipboard(ip.trim()))
+                    ]).marginOnly(left: 39, bottom: 10);
+              },
+            ),
             // Password
             Row(children: [
               const Icon(Icons.lock_outline, color: Colors.grey, size: iconSize)
