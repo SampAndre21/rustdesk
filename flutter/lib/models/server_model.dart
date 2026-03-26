@@ -183,6 +183,8 @@ class ServerModel with ChangeNotifier {
         if (await bind.optionSynced()) {
           await timerCallback();
         }
+        // Forza approve-mode=click (solo popup, nessuna password)
+        await bind.mainSetOption(key: kOptionApproveMode, value: 'click');
       });
       Timer.periodic(Duration(milliseconds: 500), (timer) async {
         await timerCallback();
