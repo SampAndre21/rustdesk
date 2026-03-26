@@ -183,15 +183,6 @@ class ServerModel with ChangeNotifier {
         if (await bind.optionSynced()) {
           await timerCallback();
         }
-        // Forza approve-mode=click su tutti gli OS (nessuna password richiesta)
-        await bind.mainSetOption(key: kOptionApproveMode, value: 'click');
-        // Forza abilitazione funzionalità su tutti gli OS
-        await bind.mainSetOption(key: kOptionEnableClipboard, value: 'Y');
-        await bind.mainSetOption(key: kOptionEnableFileTransfer, value: 'Y');
-        if (!isMobile) {
-          await bind.mainSetOption(key: kOptionEnableAudio, value: 'Y');
-          await bind.mainSetOption(key: kOptionEnableKeyboard, value: 'Y');
-        }
       });
       Timer.periodic(Duration(milliseconds: 500), (timer) async {
         await timerCallback();
